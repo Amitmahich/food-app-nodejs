@@ -1,5 +1,6 @@
 const userModel = require("../models/userModel");
 const bcrypt = require("bcryptjs");
+const JWT = require("jsonwebtoken");
 
 //REGISTER
 const registerController = async (req, res) => {
@@ -47,6 +48,8 @@ const registerController = async (req, res) => {
     });
   }
 };
+
+//login
 const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -73,12 +76,17 @@ const loginController = async (req, res) => {
       });
     }
 
+    const token = JWT.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
     //response me password ko hide krne ke liye
     user.password = undefined;
 
     res.status(200).send({
       success: true,
       message: "Login Successfully!",
+      token,
       user,
     });
   } catch (error) {
