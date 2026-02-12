@@ -7,6 +7,7 @@ const testRoutes = require("./routes/testRoutes");
 const connectDb = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const foodRoutes = require("./routes/foodRoutes");
 
 //dotenv configuration
 dotenv.config();
@@ -25,6 +26,7 @@ app.use(morgan("dev"));
 app.use("/api/v1/test", testRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/food", foodRoutes);
 
 //routing kri hai
 app.get("/", (req, res) => {
