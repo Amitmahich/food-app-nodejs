@@ -76,9 +76,13 @@ const loginController = async (req, res) => {
       });
     }
 
-    const token = JWT.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = JWT.sign(
+      { id: user._id, userRole: user.userType },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      },
+    );
 
     //response me password ko hide krne ke liye
     user.password = undefined;

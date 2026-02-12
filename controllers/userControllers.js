@@ -41,7 +41,14 @@ const updateUserController = async (req, res) => {
       });
     }
     //update user details
-    const { userName, address, phone } = req.body;
+    const { userName, address, phone } = req.body || {};
+    //validate request body
+    if (!userName && !address && !phone) {
+      return res.status(400).send({
+        success: true,
+        message: "Please Provide at least one Field ",
+      });
+    }
     if (userName) user.userName = userName;
     if (address) user.address = address;
     if (phone) user.phone = phone;
@@ -64,7 +71,7 @@ const updateUserController = async (req, res) => {
 //change password
 const changePassWordController = async (req, res) => {
   try {
-    const { oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword } = req.body || {}; //matalb body me kuch diya hi nhi
     //validation
     if (!oldPassword || !newPassword) {
       return res.status(400).send({
@@ -107,7 +114,7 @@ const changePassWordController = async (req, res) => {
 //update password
 const updatePasswordController = async (req, res) => {
   try {
-    const { newPassword } = req.body;
+    const { newPassword } = req.body || {};
     // validation
     if (!newPassword) {
       return res.status(400).send({
@@ -150,9 +157,67 @@ const updatePasswordController = async (req, res) => {
     });
   }
 };
+// delete account
+const deleteAccountController = async (req, res) => {
+  try {
+    const { password } = req.body || {};
+    //validation
+    if (!password) {
+      return res.status(400).send({
+        success: false,
+        message: "Password is required!",
+      });
+    }
+    //find user
+    const user_id = req.user.id;
+    const user = await userModel.findById(user_id);
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found!",
+      });
+    }
+    // verify password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).send({
+        success: true,
+        message: "Wrong password!",
+      });
+    }
+    //delete
+    await user.deleteOne();
+    res.status(200).send({
+      success: true,
+      message: "Account deleted successfully!",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in delete account API",
+    });
+  }
+};
+// logout
+const logoutController = async (req, res) => {
+  try {
+    res.status(200).send({
+      success: true,
+      message: "Logged out successfully!",
+    });
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Error in logout API",
+    });
+  }
+};
 module.exports = {
   getUserController,
   updateUserController,
   changePassWordController,
   updatePasswordController,
+  deleteAccountController,
+  logoutController,
 };
