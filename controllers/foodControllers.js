@@ -96,9 +96,111 @@ const getMyFoodController = async (req, res) => {
     });
   }
 };
+//update food
+const updateFoodController = async (req, res) => {
+  try {
+    const food_id = req.params.id;
+    const food = await foodModel.findById(food_id);
+    if (!food) {
+      return res.status(404).send({
+        success: false,
+        message: "Food not found!",
+      });
+    }
+    //ownership check=>food ka owner nahi and admin bhi nahi
+    if (
+      food.vendor.toString() !== req.user.id &&
+      req.user.userRole !== "admin"
+    ) {
+      return res.status(403).send({
+        success: false,
+        message: "You can only update your own food",
+      });
+    }
+    // Allowed fields only
+    const allowedFields = [
+      "title",
+      "description",
+      "price",
+      "category",
+      "image",
+      "isAvailable",
+    ];
+
+    const requestFields = Object.keys(req.body); //esse req.body me jo data hai un eb ki first key aa jayegi
+
+    // Check for invalid fields
+    const invalidFields = requestFields.filter(
+      (field) => !allowedFields.includes(field),
+    );
+
+    if (invalidFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `You cannot update: ${invalidFields.join(", ")}`,
+      });
+    }
+
+    const updatedFood = await foodModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        returnDocument: "after",
+        runValidators: true,
+      },
+    );
+    res.status(200).send({
+      success: true,
+      message: "Food updated successfully!",
+      updatedFood,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Update food API",
+    });
+  }
+};
+//delete food
+const deleteFoodController = async (req, res) => {
+  try {
+    const food_id = req.params.id;
+    //find food
+    const food = await foodModel.findById(food_id);
+    if (!food) {
+      return re.status(404).send({
+        success: true,
+        message: "Food not found!",
+      });
+    }
+    if (
+      food.vendor.toString() !== req.user.id &&
+      req.user.userRole !== "admin"
+    ) {
+      return res.status(403).send({
+        success: true,
+        message: "You can only delete only your food!",
+      });
+    }
+    await foodModel.findByIdAndDelete(food_id);
+    res.status(200).send({
+      success: true,
+      message: "Food deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Delete food API",
+    });
+  }
+};
 module.exports = {
   addFoodController,
   getAllFoodController,
   getSingleFoodController,
   getMyFoodController,
+  updateFoodController,
+  deleteFoodController
 };

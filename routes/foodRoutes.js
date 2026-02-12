@@ -4,6 +4,8 @@ const {
   getAllFoodController,
   getSingleFoodController,
   getMyFoodController,
+  updateFoodController,
+  deleteFoodController,
 } = require("../controllers/foodControllers");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const { authorizeRoles } = require("../middlewares/roleMiddleware");
@@ -26,5 +28,18 @@ router.get(
   authMiddleware,
   authorizeRoles(["vendor", "admin"]),
   getMyFoodController,
+);
+//update food
+router.put(
+  "/update-food/:id",
+  authMiddleware,
+  authorizeRoles(["vendor", "admin"]),
+  updateFoodController,
+);
+router.delete(
+  "/delete-food/:id",
+  authMiddleware,
+  authorizeRoles(["vendor", "admin"]),
+  deleteFoodController,
 );
 module.exports = router;
