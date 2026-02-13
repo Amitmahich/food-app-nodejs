@@ -7,6 +7,7 @@ const {
   getAllClientsController,
   getAllFoodController,
   deleteClientController,
+  deleteVendorController,
 } = require("../controllers/adminControllers");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 
@@ -44,5 +45,12 @@ router.delete(
   authMiddleware,
   authorizeRoles(["admin"]),
   deleteClientController,
+);
+//delete vendor
+router.delete(
+  "/delete-vendor/:id",
+  authMiddleware,
+  authorizeRoles(["admin"]),
+  deleteVendorController,
 );
 module.exports = router;
