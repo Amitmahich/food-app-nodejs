@@ -118,9 +118,7 @@ const updateQuantityController = async (req, res) => {
         message: "Cart not found!",
       });
     }
-    const item = cart.items.find(
-      (item) => item.food.toString() === food_id,
-    );
+    const item = cart.items.find((item) => item.food.toString() === food_id);
     if (!item) {
       return res.status(404).send({
         success: false,
@@ -143,8 +141,51 @@ const updateQuantityController = async (req, res) => {
     });
   }
 };
+const removeFoodController = async (req, res) => {
+  try {
+    const { food_id } = req.body || {};
+    if (!food_id) {
+      return res.status(400).send({
+        success: false,
+        message: "Food id is required!",
+      });
+    }
+    const user_id = req.user.id;
+    const cart = await cartModel.findOne({ user: user_id });
+    if (!cart) {
+      return res.status(404).send({
+        success: false,
+        message: "Cart not found!",
+      });
+    }
+    const foodExists = cart.items.some(
+      (item) => item.food.toString() === food_id,
+    );
+    if (!foodExists) {
+      return res.status(404).send({
+        success: true,
+        message: "Food not found in cart!",
+      });
+    }
+    //remove item from cart using filter
+    cart.items = cart.items.filter((item) => item.food.toString() !== food_id);
+    await cart.save();
+    res.status(200).send({
+      success: true,
+      message: "Food deleted successfully",
+      cart,
+    });
+  } catch (error) {
+    (console.log(error),
+      res.status(500).send({
+        success: false,
+        message: "Error in Remove food API",
+      }));
+  }
+};
 module.exports = {
   addToCartController,
   getMyCartController,
   updateQuantityController,
+  removeFoodController,
 };

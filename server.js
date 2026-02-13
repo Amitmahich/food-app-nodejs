@@ -9,6 +9,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const foodRoutes = require("./routes/foodRoutes");
 const cartRoutes = require("./routes/cartRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 //dotenv configuration
 dotenv.config();
@@ -29,6 +30,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/food", foodRoutes);
 app.use("/api/v1/cart", cartRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 //routing kri hai
 app.get("/", (req, res) => {
