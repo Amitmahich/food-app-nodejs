@@ -75,7 +75,7 @@ const loginController = async (req, res) => {
         message: "Invalid Email or Password!",
       });
     }
-
+    //JWT setup
     const token = JWT.sign(
       { id: user._id, userRole: user.userType },
       process.env.JWT_SECRET,
