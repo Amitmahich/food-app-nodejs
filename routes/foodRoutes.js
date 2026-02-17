@@ -6,6 +6,8 @@ const {
   getMyFoodController,
   updateFoodController,
   deleteFoodController,
+  searchFoodController,
+  filterByPriceController,
 } = require("../controllers/foodControllers");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const { authorizeRoles } = require("../middlewares/roleMiddleware");
@@ -42,4 +44,8 @@ router.delete(
   authorizeRoles(["vendor", "admin"]),
   deleteFoodController,
 );
+//search food
+router.get("/search", searchFoodController);
+//filter by price
+router.get("/filter-price", filterByPriceController);
 module.exports = router;

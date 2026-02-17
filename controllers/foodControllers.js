@@ -196,11 +196,76 @@ const deleteFoodController = async (req, res) => {
     });
   }
 };
+//search food
+const searchFoodController = async (req, res) => {
+  try {
+    const { keyword } = req.query;
+    // validation
+    if (!keyword) {
+      return res.status(400).send({
+        success: false,
+        message: "Please provide a valid keyword",
+      });
+    }
+    const foods = await foodModel.find({
+      $or: [
+        { title: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ],
+    });
+    return res.status(200).send({
+      success: true,
+      FoodCount: foods.length,
+      foods,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Search API",
+    });
+  }
+};
+//filter food by price
+const filterByPriceController = async (req, res) => {
+  const { minPrice, maxPrice } = req.query;
+  //validate
+  if (minPrice == undefined || maxPrice == undefined) {
+    return res.status(400).send({
+      success: false,
+      message: "Please provide minPrice and maxPrice",
+    });
+  }
+  const min = Number(minPrice);
+  const max = Number(maxPrice);
+
+  // Important Validation
+  if (min > max) {
+    return res.status(400).send({
+      success: false,
+      message: "minPrice cannot be greater than maxPrice",
+    });
+  }
+  const foods = await foodModel.find({
+    price: {
+      $gte: Number(minPrice) || 0,
+      $lte: Number(maxPrice) || 10000,
+    },
+  });
+  return res.status(200).send({
+    success: true,
+    totalFoods: foods.length,
+    foods,
+  });
+};
+
 module.exports = {
   addFoodController,
   getAllFoodController,
   getSingleFoodController,
   getMyFoodController,
   updateFoodController,
-  deleteFoodController
+  deleteFoodController,
+  searchFoodController,
+  filterByPriceController,
 };
